@@ -17,13 +17,16 @@ contract FeeCollector {
     receive() payable external {
         balance += msg.value; 
     }
+
+    modifier onlyOwner {
+        require(msg.sender == owner, "Only owner can withdraw");
+        _;
+    }
     
     // This function exists to allow us to send eth to the address which is one of the parameters of function => destAddr
     // Decrease the balance of the contract => amount
-    function withdraw(uint amount, address payable destAddr) public {
-        require(msg.sender == owner, "Only owner can withdraw");
+    function withdraw(uint amount, address payable destAddr) public onlyOwner {
         require(amount <= balance, "Insufficient funds");
-        
         destAddr.transfer(amount);
         balance -= amount;
     }
