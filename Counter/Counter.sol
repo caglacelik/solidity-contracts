@@ -19,7 +19,7 @@ contract Counter {
         return true;
     }
 
-    // This function is created to get the value of count variable
+    // This function is created to get value of count variable
     function get() external view returns(uint) {
         return count;
     }
