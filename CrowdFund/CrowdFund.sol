@@ -6,7 +6,7 @@ import "./IERC20.sol";
 
 contract CrowdFund {
 
-    // the struct that it holds the campaign information
+    // the struct that holds the campaign information
     struct Campaign {
         address creator;  
         uint goal;       
@@ -16,7 +16,7 @@ contract CrowdFund {
         uint pledged;    
     }
 
-    // Events for each function
+    // Events 
     event Launch(uint id, address indexed creator, uint goal, uint32 startAt, uint32 endAt);
     event Pledge(uint indexed id, address indexed caller, uint amount);
     event Unpledge(uint indexed id, address indexed caller, uint amount);
@@ -27,10 +27,10 @@ contract CrowdFund {
 
     IERC20 public immutable token; 
     uint public count;  // count of campaigns
-    mapping(uint => Campaign) public campaigns; // list of campaigns with indexes
+    mapping(uint => Campaign) public campaigns; // list of campaigns with their indexes
     mapping(uint => mapping(address => uint)) public pledgedAmount; // list of pledged amounts
 
-    // inject the token via constructor
+    // inject token via constructor
     constructor(address _token) {
         token = IERC20(_token);
     }
@@ -69,15 +69,15 @@ contract CrowdFund {
         emit Cancel(_id);
     }
 
-    // This function provides users can pledge tokens the campaign with the given parameters
+    // This function provides users can pledge tokens of the campaign 
     // _id => id of the campaign
     // _amount => amount of the pledge 
     function pledge(uint _id, uint _amount) external {
         Campaign storage campaign = campaigns[_id];
-        // Check the time is available or not
+        // Check the time is available 
         require(block.timestamp >= campaign.startAt, "Not started");
         require(block.timestamp <= campaign.endAt, "Already ended");
-        // Add the amount of the pledge of the campaign to pledgedAmount
+        // Add amount of the pledge of the campaign to pledgedAmount
         pledgedAmount[_id][msg.sender] += _amount;
         // Add pledged variable of the campaign the amount of the pledge and make the transfer via transferFrom 
         campaign.pledged += _amount;
@@ -102,13 +102,13 @@ contract CrowdFund {
     // This function provides the creator of the campaign can claim all the tokens that were pledged 
     function claim(uint _id) external {
         Campaign storage campaign = campaigns[_id];
-        // Check the caller creator or not
+        // Check the caller creator
         require(msg.sender == campaign.creator, "You're not a creator");
-        // Check the campaign ended or not
+        // Check the campaign ended
         require(block.timestamp > campaign.endAt, "Not ended"); 
         // Pledged must be greator than goal for claiming by creator
         require(campaign.pledged >= campaign.goal, "Pledged < Goal");
-        // Check already claimed or not
+        // Check already claimed
         require(!campaign.claimed, "Already claimed");
 
         campaign.claimed = true;
@@ -118,7 +118,7 @@ contract CrowdFund {
         emit Claim(_id);
     }
 
-    // This function created for users can get back their tokens from campaign if the campaign could not reach goal amount
+    // This function created for users can get back their tokens from campaign if the campaign could not reach it's goal amount
     function refund(uint _id) external {
         Campaign storage campaign = campaigns[_id];
         // Campaign time must be ended for refund  
